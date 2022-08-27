@@ -35,6 +35,8 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 		}
 
 		if err != nil {
+
+			logrus.Panicf("name: %s, err: %s", err)
 			return nil, fmt.Errorf("name: %s, err: %w", sc.Name, err)
 		}
 	}
