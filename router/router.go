@@ -10,9 +10,9 @@ import (
 )
 
 type Config struct {
-	User string
-	Pass string
-	Port int
+	User string `yaml:"user"`
+	Pass string `yaml:"pass"`
+	Port int    `yaml:"port"`
 }
 
 func Run(conf Config) {

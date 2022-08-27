@@ -13,11 +13,11 @@ var (
 )
 
 type Config struct {
-	Host   string
-	Port   int
-	User   string
-	Pass   string
-	DBName string
+	Host   string `yaml:"host"`
+	Port   int    `yaml:"port"`
+	User   string `yaml:"user"`
+	Pass   string `yaml:"pass"`
+	DBName string `yaml:"db_name"`
 }
 
 func Init(conf Config) {

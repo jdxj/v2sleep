@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v2sleep-dep
+  namespace: v2sleep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: v2sleep
+  template:
+    metadata:
+      name: v2sleep-temp
+      labels:
+        app: v2sleep
+    spec:
+      containers:
+        - name: v2sleep-c
+          image: jdxj/v2sleep:test-2dbbc59
+          command: [ "/v2sleep/v2sleep.out" ]
+          args: [ "-conf", "/v2sleep/conf.d/conf.yaml" ]
+          volumeMounts:
+            - mountPath: /v2sleep/conf.d
+              name: v2sleep-conf
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+      volumes:
+        - name: v2sleep-conf
+          secret:
+            secretName: v2sleep-conf
