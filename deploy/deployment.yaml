@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: v2sleep-c
-          image: jdxj/v2sleep:test-2dbbc59
+          image: jdxj/v2sleep:test-ba69dc5
           command: [ "/v2sleep/v2sleep.out" ]
           args: [ "-conf", "/v2sleep/conf.d/conf.yaml" ]
           volumeMounts:
