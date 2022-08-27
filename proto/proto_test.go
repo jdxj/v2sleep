@@ -50,3 +50,23 @@ func TestV2rayShadowsocks_Decode(t *testing.T) {
 		fmt.Printf("ok\n")
 	}
 }
+
+func TestV2rayVmess_Encode(t *testing.T) {
+	vv := &V2rayVmess{}
+	data := ""
+	err := vv.Decode([]byte(data))
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", vv)
+
+	data2, err := vv.Encode()
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	if data == string(data2) {
+		fmt.Printf("ok\n")
+	} else {
+		fmt.Printf("%s\n", data2)
+	}
+}
