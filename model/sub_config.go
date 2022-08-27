@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/jdxj/v2sleep/dao"
 	"github.com/jdxj/v2sleep/proto"
@@ -42,33 +41,6 @@ func ListSubConfig(ctx context.Context) (*ListSubConfigRsp, error) {
 		})
 	}
 	return rsp, nil
-}
-
-type AddClashSubAddrReq struct {
-	Name    string `json:"name" binding:"required"`
-	Address string `json:"address" binding:"required"`
-}
-
-type AddClashSubAddrRsp struct {
-	ID uint32 `json:"id"`
-}
-
-func AddClashSubAddr(ctx context.Context, req *AddClashSubAddrReq) (*AddClashSubAddrRsp, error) {
-	now := time.Now()
-	sc := &dao.SubConfig{
-		Name:     req.Name,
-		Type:     uint8(proto.ClashSubAddr),
-		Data:     []byte(req.Address),
-		CreateAt: now,
-		UpdateAt: now,
-	}
-	err := dao.DB.WithContext(ctx).
-		Create(sc).
-		Error
-	if err != nil {
-		return nil, err
-	}
-	return &AddClashSubAddrRsp{ID: sc.ID}, nil
 }
 
 type DeleteSubConfigReq struct {

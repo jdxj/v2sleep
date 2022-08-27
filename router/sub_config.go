@@ -22,14 +22,14 @@ func DeleteSubConfig(ctx *gin.Context) {
 }
 
 func AddClashSubAddr(ctx *gin.Context) {
-	req := &model.AddClashSubAddrReq{}
+	req := &model.AddSubAddrReq{}
 	handle(ctx, req, func(ctx context.Context) (interface{}, error) {
 		return model.AddClashSubAddr(ctx, req)
 	})
 }
 
 func AddV2raySubAddr(ctx *gin.Context) {
-	req := &model.AddV2raySubAddrReq{}
+	req := &model.AddSubAddrReq{}
 	handle(ctx, req, func(ctx context.Context) (interface{}, error) {
 		return model.AddV2raySubAddr(ctx, req)
 	})

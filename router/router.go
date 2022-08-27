@@ -57,7 +57,7 @@ func register(conf Config, root gin.IRouter) {
 	{
 		rSubConfig.GET("/", ListSubConfig)
 		rSubConfig.DELETE("/", DeleteSubConfig)
-		// rSubConfig.POST("/clash_sub_addr", AddClashSubAddr)
+		rSubConfig.POST("/clash_sub_addr", AddClashSubAddr)
 		rSubConfig.POST("/v2ray_sub_addr", AddV2raySubAddr)
 	}
 }

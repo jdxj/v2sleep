@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 func NewV2raySubAddrParser() *V2raySubAddrParser {
@@ -108,43 +107,8 @@ func (vsa *V2raySubAddrParser) Decode(data []byte) error {
 	return nil
 }
 
-func (vsa *V2raySubAddrParser) Merge(other *V2raySubAddrParser) {
-	for _, v := range other.v2raies {
-		vsa.v2raies = append(vsa.v2raies, v)
-	}
-}
-
-func NewClashConfig(r io.Reader) (*ClashConfig, error) {
-	decoder := yaml.NewDecoder(r)
-	cc := &ClashConfig{}
-	return cc, decoder.Decode(cc)
-}
-
-type Proxy struct {
-	Name     string `yaml:"name"`
-	Server   string `yaml:"server"`
-	Port     int    `yaml:"port"`
-	Type     string `yaml:"type"`
-	Cipher   string `json:"cipher"`
-	Password string `json:"password"`
-}
-
-type ClashConfig struct {
-	Proxies []Proxy `yaml:"proxies"`
-}
-
-func (cc *ClashConfig) ToV2rayShadowsocks() []*V2rayShadowsocks {
-	var vsss []*V2rayShadowsocks
-	for _, p := range cc.Proxies {
-		vsss = append(vsss, &V2rayShadowsocks{
-			Cipher:   p.Cipher,
-			Password: p.Password,
-			Server:   p.Server,
-			Port:     p.Port,
-			Name:     p.Name,
-		})
-	}
-	return vsss
+func (vsa *V2raySubAddrParser) Merge(vs ...V2ray) {
+	vsa.v2raies = append(vsa.v2raies, vs...)
 }
 
 type V2ray interface {

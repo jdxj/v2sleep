@@ -83,3 +83,15 @@ func TestNewV2raySubAddrParser(t *testing.T) {
 		fmt.Printf("%+v\n", v)
 	}
 }
+
+func TestNewClashSubAddrParser(t *testing.T) {
+	csa := NewClashSubAddrParser()
+	addr := ""
+	err := csa.Decode([]byte(addr))
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	for _, v := range csa.Proxies {
+		fmt.Printf("%+v\n", v)
+	}
+}
