@@ -70,3 +70,16 @@ func TestV2rayVmess_Encode(t *testing.T) {
 		fmt.Printf("%s\n", data2)
 	}
 }
+
+func TestNewV2raySubAddrParser(t *testing.T) {
+	vsa := NewV2raySubAddrParser()
+	addr := ""
+	err := vsa.Decode([]byte(addr))
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+
+	for _, v := range vsa.v2raies {
+		fmt.Printf("%+v\n", v)
+	}
+}

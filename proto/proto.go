@@ -1,8 +1,10 @@
 package proto
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,32 +13,105 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
-var (
-	ParserMap = map[ConfType]Parser{
-		V2raySubAddr: &V2raySubAddrParser{hc: &http.Client{}},
+func NewV2raySubAddrParser() *V2raySubAddrParser {
+	return &V2raySubAddrParser{
+		hc: &http.Client{},
 	}
-)
-
-type Parser interface {
-	Parse(data []byte) (string, error)
 }
 
 type V2raySubAddrParser struct {
-	hc *http.Client
+	hc      *http.Client
+	v2raies []V2ray
 }
 
-func (vsa *V2raySubAddrParser) Parse(data []byte) (string, error) {
+func (vsa *V2raySubAddrParser) Encode() ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	for _, v := range vsa.v2raies {
+		data, err := v.Encode()
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, '\n')
+		_, err = buf.Write(data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	s := base64.StdEncoding.EncodeToString(buf.Bytes())
+	buf.Reset()
+	_, err := buf.WriteString(s)
+	return buf.Bytes(), err
+}
+
+func (vsa *V2raySubAddrParser) Decode(data []byte) error {
 	rsp, err := vsa.hc.Get(string(data))
 	if err != nil {
-		return "", err
+		return err
 	}
-	_ = rsp
-	// todo
-	return "", nil
 
+	buf := bytes.NewBuffer(nil)
+	_, err = io.Copy(buf, rsp.Body)
+	if err != nil {
+		_ = rsp.Body.Close()
+		return err
+	}
+	_ = rsp.Body.Close()
+
+	data, err = base64.StdEncoding.DecodeString(buf.String())
+	if err != nil {
+		return err
+	}
+	buf.Reset()
+	_, err = buf.Write(data)
+	if err != nil {
+		return err
+	}
+	for {
+		data, err = buf.ReadBytes('\n')
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+		data = bytes.TrimSuffix(data, []byte{'\n'})
+
+		i := strings.Index(string(data), "://")
+		if i < 0 {
+			logrus.Warnf("read invalid row: %s", data)
+			continue
+		}
+
+		var v2 V2ray
+		switch string(data[:i]) {
+		case "ss":
+			v2 = &V2rayShadowsocks{}
+			err = v2.Decode(data)
+		case "vmess":
+			v2 = &V2rayVmess{}
+			err = v2.Decode(data)
+		default:
+			logrus.Warnf("%s not supported: %s", data[:i], data)
+			continue
+		}
+		if err != nil {
+			return err
+		}
+
+		vsa.v2raies = append(vsa.v2raies, v2)
+	}
+	return nil
+}
+
+func (vsa *V2raySubAddrParser) Merge(other *V2raySubAddrParser) {
+	for _, v := range other.v2raies {
+		vsa.v2raies = append(vsa.v2raies, v)
+	}
 }
 
 func NewClashConfig(r io.Reader) (*ClashConfig, error) {
