@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jdxj/v2sleep/dao"
+	"github.com/jdxj/v2sleep/proto"
 )
 
 type AddV2raySubAddrReq struct {
@@ -20,7 +21,7 @@ func AddV2raySubAddr(ctx context.Context, req *AddV2raySubAddrReq) (*AddV2raySub
 	now := time.Now()
 	sc := &dao.SubConfig{
 		Name:     req.Name,
-		Type:     uint8(V2raySubAddr),
+		Type:     uint8(proto.V2raySubAddr),
 		Data:     []byte(req.Address),
 		CreateAt: now,
 		UpdateAt: now,

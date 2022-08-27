@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/jdxj/v2sleep/dao"
+	"github.com/jdxj/v2sleep/proto"
 )
 
 type item struct {
-	ID   uint32   `json:"id"`
-	Name string   `json:"name"`
-	Type ConfType `json:"type"`
-	Data string   `json:"data"`
+	ID   uint32         `json:"id"`
+	Name string         `json:"name"`
+	Type proto.ConfType `json:"type"`
+	Data string         `json:"data"`
 }
 
 type ListSubConfigRsp struct {
@@ -36,7 +37,7 @@ func ListSubConfig(ctx context.Context) (*ListSubConfigRsp, error) {
 		rsp.List = append(rsp.List, item{
 			ID:   v.ID,
 			Name: v.Name,
-			Type: ConfType(v.Type),
+			Type: proto.ConfType(v.Type),
 			Data: string(v.Data),
 		})
 	}
@@ -56,7 +57,7 @@ func AddClashSubAddr(ctx context.Context, req *AddClashSubAddrReq) (*AddClashSub
 	now := time.Now()
 	sc := &dao.SubConfig{
 		Name:     req.Name,
-		Type:     uint8(ClashSubAddr),
+		Type:     uint8(proto.ClashSubAddr),
 		Data:     []byte(req.Address),
 		CreateAt: now,
 		UpdateAt: now,

@@ -1,4 +1,4 @@
-package model
+package proto
 
 type ConfType int
 
@@ -9,5 +9,5 @@ const (
 const (
 	V2raySubAddr   ConfType = 201
 	V2rayShareLink ConfType = 202
-	V2rayVmess     ConfType = 203
+	V2rayVmessJson ConfType = 203
 )

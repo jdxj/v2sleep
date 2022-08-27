@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/jdxj/v2sleep/dao"
+	"github.com/jdxj/v2sleep/proto"
 )
 
 func GenShare(ctx context.Context) (*bytes.Buffer, error) {
@@ -15,7 +16,7 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 	err := dao.DB.WithContext(ctx).
 		Model(dao.SubConfig{}).
 		// todo: 暂时使用 clash
-		Where("type = ?", V2raySubAddr).
+		Where("type = ?", proto.V2raySubAddr).
 		First(&sc).
 		Error
 	if err != nil {
