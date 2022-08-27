@@ -19,7 +19,7 @@ k8s.create.service:
 
 .PHONY: k8s.set.image
 k8s.set.image:
-	@kubectl $(KUBE_CONFIG) -n $(NAMESPACE) set image deployment $(NAMESPACE)-dep j$(NAMESPACE)-c=$(DOCKER_TAG)
+	@kubectl $(KUBE_CONFIG) -n $(NAMESPACE) set image deployment $(NAMESPACE)-dep $(NAMESPACE)-c=$(DOCKER_TAG)
 
 .PHONY: k8s.apply.secret
 k8s.apply.secret:
