@@ -3,33 +3,38 @@ package model
 import (
 	"bytes"
 	"context"
-	"io"
-	"net/http"
+	"fmt"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/jdxj/v2sleep/dao"
 	"github.com/jdxj/v2sleep/proto"
 )
 
 func GenShare(ctx context.Context) (*bytes.Buffer, error) {
-	// todo: 暂时使用一个
-	sc := &dao.SubConfig{}
+	var scs []*dao.SubConfig
 	err := dao.DB.WithContext(ctx).
 		Model(dao.SubConfig{}).
-		// todo: 暂时使用 clash
-		Where("type = ?", proto.V2raySubAddr).
-		First(&sc).
+		Find(&scs).
 		Error
 	if err != nil {
 		return nil, err
 	}
 
-	rsp, err := http.Get(string(sc.Data))
-	if err != nil {
-		return nil, err
+	vsa := proto.NewV2raySubAddrParser()
+	for _, sc := range scs {
+		switch proto.ConfType(sc.Type) {
+		case proto.ClashSubAddr:
+			logrus.Warnf("clash sub addr not support")
+			continue
+		case proto.V2raySubAddr:
+			err = vsa.Decode(sc.Data)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("name: %s, err: %w", sc.Name, err)
+		}
 	}
-	defer rsp.Body.Close()
 
-	buf := bytes.NewBuffer(nil)
-	_, err = io.Copy(buf, rsp.Body)
-	return buf, err
+	data, err := vsa.Encode()
+	return bytes.NewBuffer(data), err
 }
