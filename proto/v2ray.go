@@ -130,19 +130,19 @@ func (vss *V2rayShadowsocks) Decode(data []byte) error {
 }
 
 type V2rayVmess struct {
-	Version   string `json:"v"`
-	Name      string `json:"ps"`
-	Address   string `json:"add"`
-	Port      int    `json:"port"`
-	ID        string `json:"id"`
-	AID       int    `json:"aid"`
-	Security  string `json:"scy"`
-	TransType string `json:"net"`
-	FakeType  string `json:"type"`
-	FakeHost  string `json:"host"`
-	FakePath  string `json:"path"`
-	TLS       string `json:"tls"`
-	SNI       string `json:"sni"`
+	Version   string          `json:"v"`
+	Name      string          `json:"ps"`
+	Address   string          `json:"add"`
+	Port      int             `json:"port"`
+	ID        string          `json:"id"`
+	AID       json.RawMessage `json:"aid"`
+	Security  string          `json:"scy"`
+	TransType string          `json:"net"`
+	FakeType  string          `json:"type"`
+	FakeHost  string          `json:"host"`
+	FakePath  string          `json:"path"`
+	TLS       string          `json:"tls"`
+	SNI       string          `json:"sni"`
 }
 
 func (vv *V2rayVmess) Encode() ([]byte, error) {
