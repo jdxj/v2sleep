@@ -28,23 +28,7 @@ type V2raySubAddrParser struct {
 }
 
 func (vsa *V2raySubAddrParser) Encode() ([]byte, error) {
-	buf := bytes.NewBuffer(nil)
-	for _, v := range vsa.v2raies {
-		data, err := v.Encode()
-		if err != nil {
-			return nil, err
-		}
-		data = append(data, '\n')
-		_, err = buf.Write(data)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	s := base64.StdEncoding.EncodeToString(buf.Bytes())
-	buf.Reset()
-	_, err := buf.WriteString(s)
-	return buf.Bytes(), err
+	return encodeV2ray(vsa.v2raies)
 }
 
 func (vsa *V2raySubAddrParser) Decode(data []byte) error {
@@ -80,28 +64,11 @@ func (vsa *V2raySubAddrParser) Decode(data []byte) error {
 		}
 		data = bytes.TrimSuffix(data, []byte{'\n'})
 
-		i := strings.Index(string(data), "://")
-		if i < 0 {
-			logrus.Warnf("read invalid row: %s", data)
-			continue
-		}
-
-		var v2 V2ray
-		switch string(data[:i]) {
-		case "ss":
-			v2 = &V2rayShadowsocks{}
-			err = v2.Decode(data)
-		case "vmess":
-			v2 = &V2rayVmess{}
-			err = v2.Decode(data)
-		default:
-			logrus.Warnf("%s not supported: %s", data[:i], data)
-			continue
-		}
+		v2, err := decodeShareLink(data)
 		if err != nil {
-			return err
+			logrus.Warnf("%s", err)
+			continue
 		}
-
 		vsa.v2raies = append(vsa.v2raies, v2)
 	}
 	return nil

@@ -21,10 +21,13 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
+	slp := proto.NewShareLinkParser()
 	csa := proto.NewClashSubAddrParser()
 	vsa := proto.NewV2raySubAddrParser()
 	for _, sc := range scs {
 		switch proto.ConfType(sc.Type) {
+		case proto.ShareLink:
+			err = slp.Decode(sc.Data)
 		case proto.ClashSubAddr:
 			err = csa.Decode(sc.Data)
 		case proto.V2raySubAddr:
@@ -33,14 +36,12 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 			logrus.Warnf("conf type %d not support", sc.Type)
 			continue
 		}
-
 		if err != nil {
-
-			logrus.Panicf("name: %s, err: %s", err)
 			return nil, fmt.Errorf("name: %s, err: %w", sc.Name, err)
 		}
 	}
 
+	vsa.Merge(slp.ToV2ray()...)
 	vsa.Merge(csa.ToV2ray()...)
 	data, err := vsa.Encode()
 	return bytes.NewBuffer(data), err

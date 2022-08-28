@@ -17,6 +17,10 @@ type AddSubAddrRsp struct {
 	ID uint32 `json:"id"`
 }
 
+func AddShareLink(ctx context.Context, req *AddSubAddrReq) (*AddSubAddrRsp, error) {
+	return addSubAddr(ctx, proto.ShareLink, req)
+}
+
 func AddClashSubAddr(ctx context.Context, req *AddSubAddrReq) (*AddSubAddrRsp, error) {
 	return addSubAddr(ctx, proto.ClashSubAddr, req)
 }

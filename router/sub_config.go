@@ -34,3 +34,10 @@ func AddV2raySubAddr(ctx *gin.Context) {
 		return model.AddV2raySubAddr(ctx, req)
 	})
 }
+
+func AddShareLink(ctx *gin.Context) {
+	req := &model.AddSubAddrReq{}
+	handle(ctx, req, func(ctx context.Context) (interface{}, error) {
+		return model.AddShareLink(ctx, req)
+	})
+}
