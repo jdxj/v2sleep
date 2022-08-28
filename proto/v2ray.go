@@ -133,7 +133,7 @@ type V2rayVmess struct {
 	Version   string          `json:"v"`
 	Name      string          `json:"ps"`
 	Address   string          `json:"add"`
-	Port      int             `json:"port"`
+	Port      json.RawMessage `json:"port"`
 	ID        string          `json:"id"`
 	AID       json.RawMessage `json:"aid"`
 	Security  string          `json:"scy"`
