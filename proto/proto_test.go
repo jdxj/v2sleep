@@ -95,3 +95,21 @@ func TestNewClashSubAddrParser(t *testing.T) {
 		fmt.Printf("%+v\n", v)
 	}
 }
+
+func TestV2rayTrojan_Decode(t *testing.T) {
+	vt := &V2rayTrojan{}
+	data := ""
+	err := vt.Decode([]byte(data))
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", vt)
+
+	data2, err := vt.Encode()
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	if data == string(data2) {
+		fmt.Printf("ok\n")
+	}
+}

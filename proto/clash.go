@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -47,31 +48,50 @@ func (csa *ClashSubAddrParser) Decode(data []byte) error {
 func (csa *ClashSubAddrParser) ToV2ray() []V2ray {
 	var v2raies []V2ray
 	for _, p := range csa.Proxies {
-		v2raies = append(v2raies, p.ToV2rayShadowsocks())
+		if v := p.ToV2ray(); v != nil {
+			v2raies = append(v2raies, v)
+		}
 	}
 	return v2raies
 }
 
 type Proxy struct {
-	Name     string `yaml:"name"`
-	Server   string `yaml:"server"`
-	Port     int    `yaml:"port"`
-	Type     string `yaml:"type"`
-	Cipher   string `json:"cipher"`
-	Password string `json:"password"`
+	Name           string `yaml:"name"`
+	Server         string `yaml:"server"`
+	Port           int    `yaml:"port"`
+	Type           string `yaml:"type"`
+	Cipher         string `json:"cipher"`
+	Password       string `json:"password"`
+	SNI            string `json:"sni"`
+	SkipCertVerify bool   `json:"skip-cert-verify"`
+	UDP            bool   `json:"udp"`
 }
 
-func (p *Proxy) ToV2rayShadowsocks() *V2rayShadowsocks {
-	if p.Type != "ss" {
-		return nil
+func (p *Proxy) ToV2ray() V2ray {
+	switch p.Type {
+	case "ss":
+		return &V2rayShadowsocks{
+			Cipher:   p.Cipher,
+			Password: p.Password,
+			Server:   p.Server,
+			Port:     p.Port,
+			Name:     p.Name,
+		}
+
+	case "trojan":
+		return &V2rayTrojan{
+			Password:   p.Password,
+			Server:     p.Server,
+			Port:       p.Port,
+			Security:   "tls",
+			HeaderType: "none",
+			Type:       "tcp",
+			Name:       p.Name,
+		}
+	default:
+		logrus.Warnf("%s can not to V2ray", p.Type)
 	}
-	return &V2rayShadowsocks{
-		Cipher:   p.Cipher,
-		Password: p.Password,
-		Server:   p.Server,
-		Port:     p.Port,
-		Name:     p.Name,
-	}
+	return nil
 }
 
 type ClashConfig struct {
