@@ -1,10 +1,12 @@
-package proto
+package v2rayng
 
 import (
 	"fmt"
 	"net/url"
 	"regexp"
 	"testing"
+
+	"github.com/jdxj/v2sleep/proto/clash"
 )
 
 func TestV2rayShadowsocks_String(t *testing.T) {
@@ -72,20 +74,16 @@ func TestV2rayVmess_Encode(t *testing.T) {
 }
 
 func TestNewV2raySubAddrParser(t *testing.T) {
-	vsa := NewV2raySubAddrParser()
+	vsa := NewSubAddrParser()
 	addr := ""
 	err := vsa.Decode([]byte(addr))
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
-
-	for _, v := range vsa.v2raies {
-		fmt.Printf("%+v\n", v)
-	}
 }
 
 func TestNewClashSubAddrParser(t *testing.T) {
-	csa := NewClashSubAddrParser()
+	csa := clash.NewSubAddrParser()
 	addr := ""
 	err := csa.Decode([]byte(addr))
 	if err != nil {

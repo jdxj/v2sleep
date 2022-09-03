@@ -9,6 +9,9 @@ import (
 
 	"github.com/jdxj/v2sleep/dao"
 	"github.com/jdxj/v2sleep/proto"
+	"github.com/jdxj/v2sleep/proto/clash"
+	"github.com/jdxj/v2sleep/proto/convert"
+	"github.com/jdxj/v2sleep/proto/v2rayng"
 )
 
 func GenShare(ctx context.Context) (*bytes.Buffer, error) {
@@ -21,15 +24,15 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	slp := proto.NewShareLinkParser()
-	csa := proto.NewClashSubAddrParser()
-	vsa := proto.NewV2raySubAddrParser()
+	csa := clash.NewSubAddrParser()
+	slp := v2rayng.NewShareLinkParser()
+	vsa := v2rayng.NewSubAddrParser()
 	for _, sc := range scs {
 		switch proto.ConfType(sc.Type) {
-		case proto.ShareLink:
-			err = slp.Decode(sc.Data)
 		case proto.ClashSubAddr:
 			err = csa.Decode(sc.Data)
+		case proto.ShareLink:
+			err = slp.Decode(sc.Data)
 		case proto.V2raySubAddr:
 			err = vsa.Decode(sc.Data)
 		default:
@@ -41,8 +44,8 @@ func GenShare(ctx context.Context) (*bytes.Buffer, error) {
 		}
 	}
 
-	vsa.Merge(slp.ToV2ray()...)
-	vsa.Merge(csa.ToV2ray()...)
+	vsa.Merge(slp.V2raies...)
+	vsa.Merge(convert.ProxyToV2rayNG(csa.Proxies...)...)
 	data, err := vsa.Encode()
 	return bytes.NewBuffer(data), err
 }

@@ -1,10 +1,12 @@
-package proto
+package v2rayng
 
 import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
 	"strings"
+
+	"github.com/jdxj/v2sleep/proto"
 )
 
 func NewShareLinkParser() *ShareLinkParser {
@@ -12,14 +14,14 @@ func NewShareLinkParser() *ShareLinkParser {
 }
 
 type ShareLinkParser struct {
-	v2raies []V2ray
+	V2raies []proto.V2rayNG
 }
 
 func (slp *ShareLinkParser) Encode() ([]byte, error) {
-	return encodeV2ray(slp.v2raies)
+	return encodeV2ray(slp.V2raies)
 }
 
-func encodeV2ray(v2raies []V2ray) ([]byte, error) {
+func encodeV2ray(v2raies []proto.V2rayNG) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	for _, v := range v2raies {
 		data, err := v.Encode()
@@ -45,22 +47,18 @@ func (slp *ShareLinkParser) Decode(data []byte) error {
 		return err
 	}
 
-	slp.v2raies = append(slp.v2raies, v2)
+	slp.V2raies = append(slp.V2raies, v2)
 	return nil
 }
 
-func (slp *ShareLinkParser) ToV2ray() []V2ray {
-	return slp.v2raies
-}
-
-func decodeShareLink(data []byte) (V2ray, error) {
+func decodeShareLink(data []byte) (proto.V2rayNG, error) {
 	i := strings.Index(string(data), "://")
 	if i < 0 {
 		return nil, fmt.Errorf("invalid share link: %s", data)
 	}
 
 	var (
-		v2  V2ray
+		v2  proto.V2rayNG
 		err error
 	)
 	switch string(data[:i]) {
