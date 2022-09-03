@@ -58,7 +58,7 @@ func (csa *ClashSubAddrParser) ToV2ray() []V2ray {
 type Proxy struct {
 	Name           string `yaml:"name"`
 	Server         string `yaml:"server"`
-	Port           int    `yaml:"port"`
+	Port           int64  `yaml:"port"`
 	Type           string `yaml:"type"`
 	Cipher         string `json:"cipher"`
 	Password       string `json:"password"`

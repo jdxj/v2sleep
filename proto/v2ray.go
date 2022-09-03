@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -87,7 +86,7 @@ type V2rayShadowsocks struct {
 	Cipher   string
 	Password string
 	Server   string
-	Port     int
+	Port     int64
 	Name     string
 }
 
@@ -112,20 +111,17 @@ func (vss *V2rayShadowsocks) Decode(data []byte) error {
 	if err != nil {
 		return err
 	}
-	reg := regexp.MustCompile(`(.*):(.*)@(.*):(.*)`)
-	conf := reg.FindStringSubmatch(string(data))
-	if len(conf) != 5 {
-		return fmt.Errorf("invalid ss config: %s", data)
-	}
-
-	vss.Cipher = conf[1]
-	vss.Password = conf[2]
-	vss.Server = conf[3]
-	port, err := strconv.ParseInt(conf[4], 10, 64)
+	u, err = url.Parse(fmt.Sprintf("%s://%s", u.Scheme, data))
 	if err != nil {
-		return fmt.Errorf("parse port %s err: %s", conf[4], err)
+		return err
 	}
-	vss.Port = int(port)
+	vss.Cipher = u.User.Username()
+	vss.Password, _ = u.User.Password()
+	vss.Server = u.Hostname()
+	vss.Port, err = strconv.ParseInt(u.Port(), 10, 64)
+	if err != nil {
+		return fmt.Errorf("parse port %s err: %s", u.Port(), err)
+	}
 	return nil
 }
 
@@ -167,7 +163,7 @@ type V2rayTrojan struct {
 	// path
 	Password string
 	Server   string
-	Port     int
+	Port     int64
 	// query
 	Security   string
 	HeaderType string
@@ -194,11 +190,10 @@ func (vt *V2rayTrojan) Decode(data []byte) error {
 
 	vt.Password = u.User.Username()
 	vt.Server = u.Hostname()
-	port, err := strconv.ParseInt(u.Port(), 10, 64)
+	vt.Port, err = strconv.ParseInt(u.Port(), 10, 64)
 	if err != nil {
 		return err
 	}
-	vt.Port = int(port)
 
 	vt.Security = u.Query().Get("security")
 	vt.HeaderType = u.Query().Get("headerType")
