@@ -8,7 +8,7 @@ import (
 )
 
 type V2rayVmess struct {
-	Version   string          `json:"v"`
+	Version   json.RawMessage `json:"v"`
 	Name      string          `json:"ps"`
 	Address   string          `json:"add"`
 	Port      json.RawMessage `json:"port"`
