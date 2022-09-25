@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -41,7 +42,8 @@ func (vsa *SubAddrParser) Decode(data []byte) error {
 	}
 	_ = rsp.Body.Close()
 
-	data, err = base64.StdEncoding.DecodeString(buf.String())
+	noPaddingData := strings.TrimRight(buf.String(), "=")
+	data, err = base64.StdEncoding.WithPadding(base64.NoPadding).DecodeString(noPaddingData)
 	if err != nil {
 		return err
 	}

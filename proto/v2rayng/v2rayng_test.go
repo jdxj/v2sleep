@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/jdxj/v2sleep/proto/clash"
@@ -109,5 +110,47 @@ func TestV2rayTrojan_Decode(t *testing.T) {
 	}
 	if data == string(data2) {
 		fmt.Printf("ok\n")
+	}
+}
+
+func TestTrim(t *testing.T) {
+	ts := []struct {
+		name string
+		cas  string
+		want string
+	}{
+		{
+			name: "case1",
+			cas:  "abc==",
+			want: "abc",
+		},
+		{
+			name: "case2",
+			cas:  "def=",
+			want: "def",
+		},
+		{
+			name: "case3",
+			cas:  "ghi",
+			want: "ghi",
+		},
+	}
+
+	for _, v := range ts {
+		t.Run(v.name, func(t *testing.T) {
+			if s := strings.TrimRight(v.cas, "="); s != v.want {
+				t.Fatalf("name: %s, get: %s, want: %s",
+					v.name, s, v.want)
+			}
+		})
+	}
+}
+
+func TestNewSubAddrParser(t *testing.T) {
+	sap := NewSubAddrParser()
+	data := ""
+	err := sap.Decode([]byte(data))
+	if err != nil {
+		t.Fatalf("%s\n", err)
 	}
 }

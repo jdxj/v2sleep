@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type V2rayShadowsocks struct {
@@ -32,7 +33,8 @@ func (vss *V2rayShadowsocks) Decode(data []byte) error {
 		return err
 	}
 
-	data, err = base64.StdEncoding.WithPadding(base64.NoPadding).DecodeString(u.Host)
+	host := strings.TrimRight(u.Host, "=")
+	data, err = base64.StdEncoding.WithPadding(base64.NoPadding).DecodeString(host)
 	if err != nil {
 		return err
 	}
