@@ -1,6 +1,7 @@
 package v2rayng
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -153,4 +154,57 @@ func TestNewSubAddrParser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
+}
+
+func TestJsonMarshal(t *testing.T) {
+	d, err := json.Marshal(1)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", d)
+}
+
+func TestJson(t *testing.T) {
+	var i any
+	err := json.Unmarshal([]byte{49}, &i)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%t\n", i)
+
+	err = json.Unmarshal([]byte("\"123\""), &i)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%t\n", i)
+}
+
+func TestJsonRawToInt(t *testing.T) {
+	p := JsonRawToInt([]byte{49})
+	fmt.Printf("%d\n", p)
+
+	p = JsonRawToInt([]byte("\"123\""))
+	fmt.Printf("%d\n", p)
+}
+
+func TestVmess_Core(t *testing.T) {
+	v := Vmess{
+		TagPrefix: "proxy",
+		Name:      "abc",
+		Address:   "abc.def.com",
+		Port:      []byte("12345"),
+		ID:        "1111-2222-3333",
+		Security:  "auto",
+		TransType: "h2",
+		FakeType:  "",
+		Host:      "abc.def.com",
+		Path:      "/",
+		TLS:       "tls",
+		SNI:       "abc.def.com",
+	}
+	d, err := json.MarshalIndent(v.Core(), "", "  ")
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%s\n", d)
 }
