@@ -14,10 +14,11 @@ import (
 
 var (
 	subAddr   = flag.String("sub-addr", "", "v2rayN(G) sub addr")
-	output    = flag.String("output", "outbounds.json", "output path")
 	include   = flag.String("include", "", "include keyword in tag")
 	exclude   = flag.String("exclude", "", "exclude keyword in tag")
+	output    = flag.String("output", "outbounds.json", "output path")
 	tagPrefix = flag.String("tag-prefix", "proxy", "tag prefix")
+	proto     = flag.String("proto", "vmess", "filter by proto")
 )
 
 func main() {
@@ -33,9 +34,10 @@ func main() {
 	}
 
 	d, err := sap.Outbounds(
-		modifyTag(*tagPrefix),
 		excludeKeyword(*exclude),
 		includeKeyword(*include),
+		filterProto(*proto),
+		addTagPrefix(*tagPrefix),
 	)
 	if err != nil {
 		logrus.Fatalf("gen outbounds config err: %s", err)
@@ -56,7 +58,7 @@ func main() {
 	}
 }
 
-func modifyTag(tagPrefix string) v2rayng.Filter {
+func addTagPrefix(tagPrefix string) v2rayng.Filter {
 	return func(out *v2raycore.Outbound) bool {
 		if tagPrefix != "" {
 			out.Tag = fmt.Sprintf("%s_%s", tagPrefix, out.Tag)
@@ -86,5 +88,17 @@ func excludeKeyword(kw string) v2rayng.Filter {
 			return false
 		}
 		return true
+	}
+}
+
+func filterProto(p string) v2rayng.Filter {
+	return func(out *v2raycore.Outbound) bool {
+		if p == "" {
+			return true
+		}
+		if out.Protocol == p {
+			return true
+		}
+		return false
 	}
 }
