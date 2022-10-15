@@ -6,9 +6,13 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/jdxj/v2sleep/proto/v2raycore"
 )
 
 type Shadowsocks struct {
+	TagPrefix string
+
 	Cipher   string
 	Password string
 	Server   string
@@ -50,4 +54,22 @@ func (vss *Shadowsocks) Decode(data []byte) error {
 		return fmt.Errorf("parse port %s err: %s", u.Port(), err)
 	}
 	return nil
+}
+
+func (vss *Shadowsocks) Outbound() (*v2raycore.Outbound, error) {
+	out := &v2raycore.Outbound{
+		Tag:      vss.Name,
+		Protocol: "shadowsocks",
+		Settings: v2raycore.SSSettings{
+			Servers: []v2raycore.SS{
+				{
+					Address:  vss.Server,
+					Port:     vss.Port,
+					Method:   vss.Cipher,
+					Password: vss.Password,
+				},
+			},
+		},
+	}
+	return out, nil
 }

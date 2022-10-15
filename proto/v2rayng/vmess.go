@@ -46,9 +46,9 @@ func (vv *Vmess) Decode(data []byte) error {
 	return json.Unmarshal(jsonData, vv)
 }
 
-func (vv *Vmess) Core() v2raycore.Outbound {
-	out := v2raycore.Outbound{
-		Tag:      fmt.Sprintf("%s_%s", vv.TagPrefix, vv.Name),
+func (vv *Vmess) Outbound() (*v2raycore.Outbound, error) {
+	out := &v2raycore.Outbound{
+		Tag:      vv.Name,
 		Protocol: "vmess",
 		Settings: v2raycore.VmessSettings{
 			VNext: []v2raycore.VNext{
@@ -57,8 +57,13 @@ func (vv *Vmess) Core() v2raycore.Outbound {
 					Port:    JsonRawToInt(vv.Port),
 					Users: []v2raycore.User{
 						{
-							ID:       vv.ID,
-							Security: vv.Security,
+							ID: vv.ID,
+							Security: func() string {
+								if vv.Security != "" {
+									return vv.Security
+								}
+								return "auto"
+							}(),
 						},
 					},
 				},
@@ -66,7 +71,7 @@ func (vv *Vmess) Core() v2raycore.Outbound {
 		},
 	}
 
-	ss := v2raycore.StreamSettings{
+	ss := &v2raycore.StreamSettings{
 		Network: vv.TransType,
 	}
 
@@ -97,7 +102,7 @@ func (vv *Vmess) Core() v2raycore.Outbound {
 				},
 			}
 		default:
-			panic(fmt.Errorf("fake type not implement: %s", vv.FakeType))
+			return nil, fmt.Errorf("fake type not implement: %s", vv.FakeType)
 		}
 	case "http", "h2":
 		ss.HttpSettings = &v2raycore.HttpSettings{
@@ -106,11 +111,11 @@ func (vv *Vmess) Core() v2raycore.Outbound {
 			Method: "GET",
 		}
 	default:
-		panic(fmt.Errorf("trans type not implement: %s", vv.TransType))
+		return nil, fmt.Errorf("trans type not implement: %s", vv.TransType)
 	}
 
 	out.StreamSettings = ss
-	return out
+	return out, nil
 }
 
 func JsonRawToInt(msg json.RawMessage) int64 {

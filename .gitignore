@@ -19,3 +19,4 @@ config/config.yaml
 config/conf.yaml
 deploy/conf.yaml
 deploy/kube_config.yaml
+proto/v2rayng/keys_test.go

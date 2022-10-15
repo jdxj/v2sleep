@@ -3,7 +3,9 @@ package v2rayng
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -11,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/jdxj/v2sleep/proto"
+	"github.com/jdxj/v2sleep/proto/v2raycore"
 )
 
 func NewSubAddrParser() *SubAddrParser {
@@ -22,6 +25,8 @@ func NewSubAddrParser() *SubAddrParser {
 type SubAddrParser struct {
 	hc      *http.Client
 	V2raies []proto.V2rayNG
+
+	TagPrefix string
 }
 
 func (vsa *SubAddrParser) Encode() ([]byte, error) {
@@ -74,4 +79,27 @@ func (vsa *SubAddrParser) Decode(data []byte) error {
 
 func (vsa *SubAddrParser) Merge(vs ...proto.V2rayNG) {
 	vsa.V2raies = append(vsa.V2raies, vs...)
+}
+
+func (vsa *SubAddrParser) Outbounds() ([]byte, error) {
+	outs := v2raycore.OutboundConfig{}
+	for _, v := range vsa.V2raies {
+		c, ok := v.(v2raycore.Outbounder)
+		if !ok {
+			logrus.Warnf("can not switch to outbounder: %+v", v)
+			continue
+		}
+
+		out, err := c.Outbound()
+		if err != nil {
+			return nil, fmt.Errorf("get outbound err: %s", err)
+		}
+
+		if vsa.TagPrefix != "" {
+			out.Tag = fmt.Sprintf("%s_%s", vsa.TagPrefix, out.Tag)
+		}
+
+		outs.Outbounds = append(outs.Outbounds, out)
+	}
+	return json.MarshalIndent(outs, "", "  ")
 }

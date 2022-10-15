@@ -202,7 +202,45 @@ func TestVmess_Core(t *testing.T) {
 		TLS:       "tls",
 		SNI:       "abc.def.com",
 	}
-	d, err := json.MarshalIndent(v.Core(), "", "  ")
+	out, _ := v.Outbound()
+	d, err := json.MarshalIndent(out, "", "  ")
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%s\n", d)
+}
+
+func TestSSOutbound(t *testing.T) {
+	ss := &Shadowsocks{
+		TagPrefix: "proxy",
+		Cipher:    "abc",
+		Password:  "def",
+		Server:    "ghi.com",
+		Port:      123,
+		Name:      "hello",
+	}
+	out, err := ss.Outbound()
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	d, err := json.MarshalIndent(out, "", "  ")
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%s\n", d)
+}
+
+var (
+	subAddr string
+)
+
+func TestSubAddrParser_Outbounds(t *testing.T) {
+	sap := NewSubAddrParser()
+	err := sap.Decode([]byte(subAddr))
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	d, err := sap.Outbounds()
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
