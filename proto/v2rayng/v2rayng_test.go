@@ -240,9 +240,14 @@ func TestSubAddrParser_Outbounds(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
-	d, err := sap.Outbounds()
+	d, err := sap.Outbounds(nil)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
 	fmt.Printf("%s\n", d)
+}
+
+func TestContains(t *testing.T) {
+	str := "abc"
+	fmt.Printf("%t\n", strings.Contains(str, ""))
 }

@@ -81,7 +81,9 @@ func (vsa *SubAddrParser) Merge(vs ...proto.V2rayNG) {
 	vsa.V2raies = append(vsa.V2raies, vs...)
 }
 
-func (vsa *SubAddrParser) Outbounds() ([]byte, error) {
+type Filter func(out *v2raycore.Outbound) bool
+
+func (vsa *SubAddrParser) Outbounds(filters ...Filter) ([]byte, error) {
 	outs := v2raycore.OutboundConfig{}
 	for _, v := range vsa.V2raies {
 		c, ok := v.(v2raycore.Outbounder)
@@ -89,17 +91,22 @@ func (vsa *SubAddrParser) Outbounds() ([]byte, error) {
 			logrus.Warnf("can not switch to outbounder: %+v", v)
 			continue
 		}
-
 		out, err := c.Outbound()
 		if err != nil {
 			return nil, fmt.Errorf("get outbound err: %s", err)
 		}
 
-		if vsa.TagPrefix != "" {
-			out.Tag = fmt.Sprintf("%s_%s", vsa.TagPrefix, out.Tag)
+		add := true
+		for _, f := range filters {
+			if !f(out) {
+				add = false
+				break
+			}
 		}
 
-		outs.Outbounds = append(outs.Outbounds, out)
+		if add {
+			outs.Outbounds = append(outs.Outbounds, out)
+		}
 	}
 	return json.MarshalIndent(outs, "", "  ")
 }
