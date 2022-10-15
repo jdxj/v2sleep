@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type V2rayVmess struct {
+type Vmess struct {
 	Version   json.RawMessage `json:"v"`
 	Name      string          `json:"ps"`
 	Address   string          `json:"add"`
@@ -23,7 +23,7 @@ type V2rayVmess struct {
 	SNI       string          `json:"sni"`
 }
 
-func (vv *V2rayVmess) Encode() ([]byte, error) {
+func (vv *Vmess) Encode() ([]byte, error) {
 	data, err := json.Marshal(vv)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (vv *V2rayVmess) Encode() ([]byte, error) {
 	return []byte(fmt.Sprintf("vmess://%s", s)), nil
 }
 
-func (vv *V2rayVmess) Decode(data []byte) error {
+func (vv *Vmess) Decode(data []byte) error {
 	s := strings.TrimPrefix(string(data), "vmess://")
 	jsonData, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {

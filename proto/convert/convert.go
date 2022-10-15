@@ -14,7 +14,7 @@ func ProxyToV2rayNG(proxies ...*clash.Proxy) []proto.V2rayNG {
 		var v proto.V2rayNG
 		switch p.Type {
 		case "ss":
-			v = &v2rayng.V2rayShadowsocks{
+			v = &v2rayng.Shadowsocks{
 				Cipher:   p.Cipher,
 				Password: p.Password,
 				Server:   p.Server,
@@ -23,7 +23,7 @@ func ProxyToV2rayNG(proxies ...*clash.Proxy) []proto.V2rayNG {
 			}
 
 		case "trojan":
-			v = &v2rayng.V2rayTrojan{
+			v = &v2rayng.Trojan{
 				Password:   p.Password,
 				Server:     p.Server,
 				Port:       p.Port,

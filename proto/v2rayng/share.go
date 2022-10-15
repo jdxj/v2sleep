@@ -63,13 +63,13 @@ func decodeShareLink(data []byte) (proto.V2rayNG, error) {
 	)
 	switch string(data[:i]) {
 	case "ss":
-		v2 = &V2rayShadowsocks{}
+		v2 = &Shadowsocks{}
 		err = v2.Decode(data)
 	case "vmess":
-		v2 = &V2rayVmess{}
+		v2 = &Vmess{}
 		err = v2.Decode(data)
 	case "trojan":
-		v2 = &V2rayTrojan{}
+		v2 = &Trojan{}
 		err = v2.Decode(data)
 	default:
 		return nil, fmt.Errorf("%s not supported: %s", data[:i], data)

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type V2rayShadowsocks struct {
+type Shadowsocks struct {
 	Cipher   string
 	Password string
 	Server   string
@@ -16,14 +16,14 @@ type V2rayShadowsocks struct {
 	Name     string
 }
 
-func (vss *V2rayShadowsocks) Encode() ([]byte, error) {
+func (vss *Shadowsocks) Encode() ([]byte, error) {
 	path := fmt.Sprintf("%s:%s@%s:%d", vss.Cipher, vss.Password, vss.Server, vss.Port)
 	path = base64.StdEncoding.WithPadding(base64.NoPadding).EncodeToString([]byte(path))
 	anchor := url.PathEscape(vss.Name)
 	return []byte(fmt.Sprintf("ss://%s#%s", path, anchor)), nil
 }
 
-func (vss *V2rayShadowsocks) Decode(data []byte) error {
+func (vss *Shadowsocks) Decode(data []byte) error {
 	u, err := url.Parse(string(data))
 	if err != nil {
 		return err

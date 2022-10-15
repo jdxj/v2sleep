@@ -38,7 +38,7 @@ func TestScan(t *testing.T) {
 }
 
 func TestV2rayShadowsocks_Decode(t *testing.T) {
-	vss := &V2rayShadowsocks{}
+	vss := &Shadowsocks{}
 	data := ""
 	err := vss.Decode([]byte(data))
 	if err != nil {
@@ -55,7 +55,7 @@ func TestV2rayShadowsocks_Decode(t *testing.T) {
 }
 
 func TestV2rayVmess_Encode(t *testing.T) {
-	vv := &V2rayVmess{}
+	vv := &Vmess{}
 	data := ""
 	err := vv.Decode([]byte(data))
 	if err != nil {
@@ -96,7 +96,7 @@ func TestNewClashSubAddrParser(t *testing.T) {
 }
 
 func TestV2rayTrojan_Decode(t *testing.T) {
-	vt := &V2rayTrojan{}
+	vt := &Trojan{}
 	data := ""
 	err := vt.Decode([]byte(data))
 	if err != nil {

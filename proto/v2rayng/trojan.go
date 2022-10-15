@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type V2rayTrojan struct {
+type Trojan struct {
 	// path
 	Password string
 	Server   string
@@ -19,13 +19,13 @@ type V2rayTrojan struct {
 	Name string
 }
 
-func (vt *V2rayTrojan) Encode() ([]byte, error) {
+func (vt *Trojan) Encode() ([]byte, error) {
 	return []byte(fmt.Sprintf("trojan://%s@%s:%d?security=%s&headerType=%s&type=%s#%s",
 		vt.Password, vt.Server, vt.Port, vt.Security, vt.HeaderType, vt.Type, url.PathEscape(vt.Name),
 	)), nil
 }
 
-func (vt *V2rayTrojan) Decode(data []byte) error {
+func (vt *Trojan) Decode(data []byte) error {
 	u, err := url.Parse(string(data))
 	if err != nil {
 		return err
