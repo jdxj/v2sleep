@@ -6,10 +6,11 @@ type StreamSettings struct {
 	TlsSettings  *TlsSettings  `json:"tlsSettings,omitempty"`
 	TcpSettings  *TcpSettings  `json:"tcpSettings,omitempty"`
 	HttpSettings *HttpSettings `json:"httpSettings,omitempty"`
+	WSSettings   *WSSettings   `json:"wsSettings,omitempty"`
 }
 
 type TlsSettings struct {
-	ServerName    string `json:"serverName"`
+	ServerName    string `json:"serverName,omitempty"`
 	AllowInsecure bool   `json:"allowInsecure"`
 }
 
@@ -41,9 +42,22 @@ type TcpSettings struct {
 
 // tcp settings end >>>
 
+// <<< http settings begin
+
 type HttpSettings struct {
 	Host    []string            `json:"host"`
 	Path    string              `json:"path"`
 	Method  string              `json:"method"`
 	Headers map[string][]string `json:"headers,omitempty"`
 }
+
+// http settings end >>>
+
+// <<< ws settings begin
+
+type WSSettings struct {
+	Path    string            `json:"path,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
+}
+
+// ws settings end >>>

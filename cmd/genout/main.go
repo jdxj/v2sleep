@@ -13,12 +13,34 @@ import (
 )
 
 var (
-	subAddr   = flag.String("sub-addr", "", "v2rayN(G) sub addr")
-	include   = flag.String("include", "", "include keyword in tag")
-	exclude   = flag.String("exclude", "", "exclude keyword in tag")
-	output    = flag.String("output", "outbounds.json", "output path")
-	tagPrefix = flag.String("tag-prefix", "proxy", "tag prefix")
-	proto     = flag.String("proto", "vmess", "filter by proto")
+	subAddr = flag.String("sub-addr", "", "v2rayN(G) sub addr")
+	include = flag.String("include", "", "include keyword in tag")
+	exclude = flag.String("exclude", "", "exclude keyword in tag")
+	output  = flag.String("output", "outbounds.json", "output path")
+	proto   = flag.String("proto", "vmess", "filter by proto")
+)
+
+var (
+	tagPrefixMap = map[rune]string{
+		'港': "hk",
+		'新': "sg",
+		'台': "tw",
+		'日': "jp",
+		'美': "us",
+		'韩': "kr",
+		'加': "ca",
+		'泰': "th",
+		'英': "gb",
+		'德': "de",
+		'俄': "ru",
+		'荷': "nl",
+		'印': "in",
+		'法': "fr",
+		'阿': "ar",
+		'巴': "br",
+		'土': "tr",
+		'澳': "au",
+	}
 )
 
 func main() {
@@ -37,7 +59,7 @@ func main() {
 		excludeKeyword(*exclude),
 		includeKeyword(*include),
 		filterProto(*proto),
-		addTagPrefix(*tagPrefix),
+		addTagPrefix(),
 	)
 	if err != nil {
 		logrus.Fatalf("gen outbounds config err: %s", err)
@@ -58,12 +80,16 @@ func main() {
 	}
 }
 
-func addTagPrefix(tagPrefix string) v2rayng.Filter {
+func addTagPrefix() v2rayng.Filter {
 	return func(out *v2raycore.Outbound) bool {
-		if tagPrefix != "" {
-			out.Tag = fmt.Sprintf("%s_%s", tagPrefix, out.Tag)
+		for key, pre := range tagPrefixMap {
+			if strings.ContainsRune(out.Tag, key) {
+				out.Tag = fmt.Sprintf("%s_%s", pre, out.Tag)
+				return true
+			}
 		}
-		return true
+		logrus.Warnf("tag prefix not matched: %s\n", out.Tag)
+		return false
 	}
 }
 

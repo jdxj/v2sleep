@@ -57,7 +57,8 @@ func (vv *Vmess) Outbound() (*v2raycore.Outbound, error) {
 					Port:    JsonRawToInt(vv.Port),
 					Users: []v2raycore.User{
 						{
-							ID: vv.ID,
+							ID:      vv.ID,
+							AlterId: vv.AID,
 							Security: func() string {
 								if vv.Security != "" {
 									return vv.Security
@@ -110,8 +111,12 @@ func (vv *Vmess) Outbound() (*v2raycore.Outbound, error) {
 			Path:   vv.Path,
 			Method: "GET",
 		}
+	case "ws":
+		ss.WSSettings = &v2raycore.WSSettings{
+			Path: vv.Path,
+		}
 	default:
-		return nil, fmt.Errorf("trans type not implement: %s", vv.TransType)
+		return nil, fmt.Errorf("trans type %s not implement: %s", vv.TransType, vv.Name)
 	}
 
 	out.StreamSettings = ss
