@@ -40,6 +40,8 @@ var (
 		'巴': "br",
 		'土': "tr",
 		'澳': "au",
+		'马': "my",
+		'菲': "ph",
 	}
 )
 
@@ -49,10 +51,19 @@ func main() {
 		panic("empty sub addr")
 	}
 
-	sap := v2rayng.NewSubAddrParser()
-	err := sap.Decode([]byte(*subAddr))
-	if err != nil {
-		logrus.Fatalf("decode err: %s", err)
+	var (
+		addrs = strings.Split(*subAddr, ",")
+		sap   = v2rayng.NewSubAddrParser()
+	)
+	for _, addr := range addrs {
+		addr = strings.TrimSpace(addr)
+		if addr == "" {
+			continue
+		}
+		err := sap.Decode([]byte(addr))
+		if err != nil {
+			logrus.Fatalf("decode err: %s", err)
+		}
 	}
 
 	d, err := sap.Outbounds(
