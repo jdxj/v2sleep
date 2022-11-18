@@ -21,27 +21,37 @@ var (
 )
 
 var (
-	tagPrefixMap = map[rune]string{
-		'港': "hk",
-		'新': "sg",
-		'台': "tw",
-		'日': "jp",
-		'美': "us",
-		'韩': "kr",
-		'加': "ca",
-		'泰': "th",
-		'英': "gb",
-		'德': "de",
-		'俄': "ru",
-		'荷': "nl",
-		'印': "in",
-		'法': "fr",
-		'阿': "ar",
-		'巴': "br",
-		'土': "tr",
-		'澳': "au",
-		'马': "my",
-		'菲': "ph",
+	tagPrefixMap = map[string]string{
+		"香港": "hk",
+		"广港": "hk",
+
+		"新加坡": "sg",
+		"广新":   "sg",
+
+		"台湾": "tw",
+		"广台": "tw",
+
+		"日本": "jp",
+		"广日": "jp",
+
+		"美国": "us",
+		"广美": "us",
+
+		"韩国":     "kr",
+		"加拿大":   "ca",
+		"泰国":     "th",
+		"英国":     "gb",
+		"德国":     "de",
+		"俄罗斯":   "ru",
+		"荷兰":     "nl",
+		"印度":     "in",
+		"法国":     "fr",
+		"阿根廷":   "ar",
+		"巴西":     "br",
+		"土耳其":   "tr",
+		"澳大利亚": "au",
+		"马来西亚": "my",
+		"菲律宾":   "ph",
 	}
 )
 
@@ -95,7 +105,7 @@ func main() {
 func addTagPrefix() v2rayng.Filter {
 	return func(out *v2raycore.Outbound) bool {
 		for key, pre := range tagPrefixMap {
-			if strings.ContainsRune(out.Tag, key) {
+			if strings.Contains(out.Tag, key) {
 				out.Tag = fmt.Sprintf("%s_%s", pre, out.Tag)
 				return true
 			}
