@@ -16,8 +16,8 @@ var (
 	subAddr = flag.String("sub-addr", "", "v2rayN(G) sub addr")
 	include = flag.String("include", "", "include keyword in tag")
 	exclude = flag.String("exclude", "", "exclude keyword in tag")
-	output  = flag.String("output", "outbounds.json", "output path")
-	proto   = flag.String("proto", "vmess", "filter by proto")
+	output  = flag.String("output", "06_outbounds_sub.json", "output path")
+	proto   = flag.String("proto", "", "filter by proto")
 )
 
 var (
@@ -70,6 +70,7 @@ func main() {
 		excludeKeyword(*exclude),
 		includeKeyword(*include),
 		filterProto(*proto),
+		distinct(),
 		addTagPrefix(),
 	)
 	if err != nil {
@@ -130,12 +131,21 @@ func excludeKeyword(kw string) v2rayng.Filter {
 
 func filterProto(p string) v2rayng.Filter {
 	return func(out *v2raycore.Outbound) bool {
-		if p == "" {
-			return true
-		}
-		if out.Protocol == p {
+		if p == "" || out.Protocol == p {
 			return true
 		}
 		return false
+	}
+}
+
+func distinct() v2rayng.Filter {
+	set := make(map[string]int)
+	return func(out *v2raycore.Outbound) bool {
+		set[out.Tag]++
+		if set[out.Tag] > 1 {
+			logrus.Warningf("repeated %s, count: %d, proto: %s", out.Tag, set[out.Tag], out.Protocol)
+			return false
+		}
+		return true
 	}
 }
