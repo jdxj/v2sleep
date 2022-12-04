@@ -58,7 +58,7 @@ func (vv *Vmess) Outbound() (*v2raycore.Outbound, error) {
 					Users: []v2raycore.User{
 						{
 							ID:      vv.ID,
-							AlterId: vv.AID,
+							AlterId: JsonRawToInt(vv.AID),
 							Security: func() string {
 								if vv.Security != "" {
 									return vv.Security
